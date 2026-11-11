@@ -1,0 +1,3 @@
+# Extra packages to build the macOS app (build_mac.sh); not needed to run the code.
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.10

@@ -1,0 +1,21 @@
+/Users/mehrnoosh/Northeastern/Codes/t-DiFC-clearance cohort/fusion_lr1e-4_wd_ls_pipeline/data/clearance-cohort-raw/BCMM1/250723-BCMM1_MM-CFSE_Pulsed_19.mat: 120.0 min
+offline : pulsed=True (ON fraction 0.20, 144 ON transitions), 150 candidates, laser-ON 24.0 min (5 s)
+realtime: mode pulsed, 160 candidates, laser-ON 24.0 min, delay from peak to its report: median 10.2 s, max 49.1 s (18 s)
+common 147, offline only 3, real-time only 13
+standardized windows of common candidates: identical (<1e-4) 97.3%, max |diff| median 0, max 3.2
+  offline only (first 10, min): [10.94, 23.45, 63.44]
+  real-time only (first 10, min): [69.28, 69.28, 76.78, 86.78, 89.28, 90.11, 91.78, 95.11, 105.95, 106.78]
+detected (p >= 0.6): offline 72, real time 71
+common candidates: |p offline - p real time| median 0, max 0.015, same call 100.0%
+detected among offline-only 1, among real-time-only 0
+
+/Users/mehrnoosh/Northeastern/Codes/t-DiFC-clearance cohort/fusion_lr1e-4_wd_ls_pipeline/data/clearance-cohort-raw/BCL12-3-1/250809-BCL1210A1_L1210A-CFSE_Pulsed_25.mat: 120.0 min
+offline : pulsed=True (ON fraction 0.21, 144 ON transitions), 61 candidates, laser-ON 25.2 min (5 s)
+realtime: mode pulsed, 59 candidates, laser-ON 25.2 min, delay from peak to its report: median 12.5 s, max 17.2 s (20 s)
+common 59, offline only 2, real-time only 0
+standardized windows of common candidates: identical (<1e-4) 96.6%, max |diff| median 0, max 8.3
+  offline only (first 10, min): [0.88, 5.88]
+detected (p >= 0.6): offline 2, real time 2
+common candidates: |p offline - p real time| median 0, max 0.0005, same call 100.0%
+detected among offline-only 0, among real-time-only 0
+

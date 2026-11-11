@@ -1,0 +1,9 @@
+device mps; train 6720, val 468, test 866 windows; spectral input (61, 3)
+seed 0: epochs 14, best epoch 6, min val BCE 0.1530, val AUC 0.9921 (22 s)
+seed 1: epochs 19, best epoch 11, min val BCE 0.1923, val AUC 0.9868 (28 s)
+seed 2: epochs 20, best epoch 12, min val BCE 0.1454, val AUC 0.9935 (29 s)
+seed 3: epochs 21, best epoch 13, min val BCE 0.1601, val AUC 0.9939 (32 s)
+seed 4: epochs 20, best epoch 12, min val BCE 0.1889, val AUC 0.9882 (29 s)
+saved /Users/mehrnoosh/Northeastern/Codes/t-DiFC-Real-Time/models/fusion_lr1e-4_wd_ls_torch.pt
+val: 5-seed mean AUC 0.9932
+test: 5-seed mean AUC 0.9779

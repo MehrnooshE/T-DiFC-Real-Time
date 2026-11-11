@@ -1,0 +1,40 @@
+/Users/mehrnoosh/Northeastern/Codes/t-DiFC-Real-Time/models/fusion_lr1e-4_wd_ls_torch.pt: 5 seeds, best epochs [6, 11, 12, 13, 12], cut-off 0.6
+val: re-scored vs training predictions, max |diff| 1.8e-07
+test: re-scored vs training predictions, max |diff| 2.9e-07
+
+PyTorch ensemble
+split                                             val                  test
+n                                                 468                   866
+TP                                                214                   367
+FP                                                  3                    10
+TN                                                231                   423
+FN                                                 20                    66
+auc                              0.993 [0.969, 0.998]  0.978 [0.878, 0.990]
+sens                             0.915 [0.704, 0.950]  0.848 [0.310, 0.923]
+spec                             0.987 [0.968, 1.000]  0.977 [0.947, 0.997]
+bal_acc                          0.951 [0.846, 0.968]  0.912 [0.650, 0.944]
+PPV (balanced set)                              0.986                 0.973
+PPV at pre-balancing prevalence                 0.893                 0.874
+
+Keras ensemble (original seeds, same windows)
+split                                             val                  test
+n                                                 468                   866
+TP                                                204                   365
+FP                                                  3                     6
+TN                                                231                   427
+FN                                                 30                    68
+auc                              0.991 [0.960, 0.997]  0.980 [0.882, 0.991]
+sens                             0.872 [0.676, 0.908]  0.843 [0.297, 0.920]
+spec                             0.987 [0.970, 1.000]  0.986 [0.964, 1.000]
+bal_acc                          0.929 [0.837, 0.948]  0.915 [0.645, 0.948]
+PPV (balanced set)                              0.986                 0.984
+PPV at pre-balancing prevalence                 0.889                  0.92
+
+Agreement PyTorch vs Keras
+split                     val      test
+n                    468.0000  866.0000
+pearson_r              0.9943    0.9960
+median_abs_diff        0.0105    0.0081
+same_call_at_cut       0.9744    0.9931
+torch_only_detected   11.0000    6.0000
+keras_only_detected    1.0000    0.0000

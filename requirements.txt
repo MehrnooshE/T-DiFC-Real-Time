@@ -1,0 +1,11 @@
+# Packages for t-DiFC-Real-Time (Python 3.11; the versions it was built and checked with).
+# No TensorFlow: the model is PyTorch. torch runs on the CPU (Apple-silicon MPS optional for training).
+numpy==2.3.2
+scipy==1.16.1
+pandas==2.3.2
+scikit-learn==1.7.1
+tqdm==4.67.1
+torch==2.12.0
+# real-time GUI
+pyqtgraph==0.14.0
+PyQt6==6.7.1
