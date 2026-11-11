@@ -1,0 +1,469 @@
+scan,category,setup,orig_idx,label,augmentation
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3129356,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,775431,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,23359591,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5075086,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,10899541,0,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,441049,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,36277579,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1521779,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,644416,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,551532,1,none
+250630-MM-tdT_Pulsed_R2_F1,Injected,Pulsed,1731344,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,533361,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,1531552,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2983014,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,6021775,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,19172401,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,4675023,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,3232523,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4071730,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,2476214,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,19735888,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,499553,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,703406,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,859373,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,41528507,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5431542,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3117783,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5268407,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,821339,1,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,11212138,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3281769,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,5194849,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,14211,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,1365903,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,1869491,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,10063349,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,3940332,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,3092834,0,none
+241007-BC4T1G-28_Awake_LLC-GFP_F1,Injected,Regular,1240680,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,2476319,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3580590,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,523408,0,none
+250124-BCL1210A-2-1-test_F1,Control,Regular,481236,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,8257204,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2389080,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,351264,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,335150,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1711477,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,4681004,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,620220,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,6751747,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,4058942,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2410351,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,18356712,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2474192,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,4188168,0,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,8616667,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,120532,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,274445,1,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,2310364,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,10244858,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,184692,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,3124302,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4011013,0,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,1173359,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3165907,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,238393,1,none
+250508-B6LLC5_Awake_Pulsed_20h_F1,Injected,Pulsed,473044,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,1557837,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,10968935,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2602721,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,21862997,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,349715,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,5789105,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4858208,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,6999666,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,402643,0,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,11142360,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,3059473,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,3208173,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,5311880,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,18587359,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,7966161,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1314832,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3939673,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3007394,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2960048,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,123622,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3858672,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,143802,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3045909,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,276044,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2263564,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3476137,1,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,8033734,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2302738,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3365910,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,5667148,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5631807,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3868821,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,36249,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,8740994,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1379633,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,192585,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,336995,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,631872,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4315305,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3860562,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,114966,1,none
+250612-BCLLC6_Awake_Pulsed_D7_end_F1,Injected,Pulsed,130110,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3739438,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,1370678,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3066605,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,5634510,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3114315,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,179956,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3306648,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4093559,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,3240885,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5135859,1,none
+250124-BCL1210A-2-1-test_F1,Control,Regular,424283,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,5748241,0,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,163786,0,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,14042347,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3949476,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,783317,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,502549,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,210561,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5512019,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,459628,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,35351896,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3813936,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,34995461,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4314497,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3208936,1,none
+test250512-B6LLC3_Awake_Pulsed_20h_F1,Control,Pulsed,149391,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3475570,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3617659,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2908760,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2804896,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,2814089,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1904620,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,146475,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,253752,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,16315259,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1350231,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,1520861,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,236234,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,7671625,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2841723,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,10043851,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,3491795,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4639704,1,none
+250124-BCL1210A-2-1-test_F1,Control,Regular,453705,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,3900564,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,8793102,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5218464,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,558998,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,2383426,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,9076796,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3139784,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,7131754,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5614943,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,1105001,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,13497673,0,none
+250630-MM-tdT_Pulsed_R2_F1,Injected,Pulsed,137675,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,20893,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3918965,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3549725,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,2940751,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4627397,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,285731,1,none
+250124-BCL1210A-2-1-test_F1,Control,Regular,1196637,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1460302,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2365853,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,146953,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,326001,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,1276519,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,967778,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4247685,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,606121,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3747687,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3388350,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,12558220,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,7704609,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1394752,1,none
+250603-B6LLC6_Awake_Pulsed_18_F1,Control,Pulsed,1048530,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5262195,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,6908704,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5087273,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2479334,0,none
+250612-BCLLC6_Awake_Pulsed_D7_end_F1,Injected,Pulsed,6122805,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5094449,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2194308,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5050891,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,785644,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,675477,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,221298,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4378077,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,4549307,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,7548647,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4761194,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1816717,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,158079,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,261161,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3128051,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3969532,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,5523443,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4538585,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,10662608,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,1160215,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5033646,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,4179984,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,21572988,0,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,2525381,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,324326,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,8631470,0,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,6410504,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2177688,1,none
+250612-BCLLC6_Awake_Pulsed_D7_end_F1,Injected,Pulsed,2816538,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1729266,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,1904262,1,none
+250630-MM-tdT_Pulsed_R2_F1,Injected,Pulsed,31869,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1807809,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3826064,1,none
+250430-B6LLC3_Awake_Pulsed_20h_F1,Injected,Pulsed,1652232,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,258327,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,2000895,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1049593,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,3624370,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,788522,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,32753,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4611313,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,1732133,0,none
+241007-BC4T1G-28_Awake_LLC-GFP_F1,Injected,Regular,1623734,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,104916,1,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,5676868,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,78930,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4057919,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,365119,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,244227,1,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,2681432,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,565111,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3877690,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,5103758,0,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,13732117,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,489499,1,none
+250124-BCL1210A-2-1-test_F1,Control,Regular,279415,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1279786,1,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,1063706,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4084894,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,4166690,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1037574,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,35971481,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,4749944,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3230604,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,212998,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5080352,1,none
+250630-MM-tdT_Pulsed_R3_F1,Injected,Pulsed,524905,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,5770274,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4484521,0,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,2163090,0,none
+250630-MM-tdT_Pulsed_R2_F1,Injected,Pulsed,2033799,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3171156,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3929848,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,46588,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,176415,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4362740,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1614151,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1433851,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5277875,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,7589852,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,30965046,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2901597,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,201824,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,12091213,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,8589957,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3655515,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,3831166,0,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,3691764,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,73484,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,2424382,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4864109,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,4389756,0,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,860173,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4175499,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4481069,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4128857,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,210982,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,14802654,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,239731,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,418196,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,812143,1,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,1858761,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,2167787,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3115004,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4412951,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,5450039,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,2289541,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,835143,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,1445231,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,8781350,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,22323732,0,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,7682938,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,277776,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5719081,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5305919,1,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,20565734,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2800431,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,2944239,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3772980,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,7121883,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,443415,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,11523257,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2473731,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5055120,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,345277,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,3173427,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4748502,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4233098,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,894666,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,25455593,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,8846511,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,8878899,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,439161,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1944272,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5152631,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,9436511,1,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,48090,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2680621,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,14811665,0,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,234311,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,32053319,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3262181,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,1056638,0,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,2580667,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,439718,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,173950,0,none
+250404-BCLLC_LLC-GFP_R2_F1,Injected,Pulsed,628462,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,331223,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,400856,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2723180,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,3538433,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,1348438,0,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,2475570,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1262755,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5754890,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2205274,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,527433,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3781647,1,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,6905168,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1009706,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,339852,1,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,8618648,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3731327,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,183842,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,8934633,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1931199,1,none
+250603-B6LLC6_Awake_Pulsed_18_F1,Control,Pulsed,2054648,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,138027,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,5336842,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4289059,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,1090879,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,17829535,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4792680,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,13642382,0,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,1524601,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,217983,1,none
+250630-MM-tdT_Pulsed_R2_F1,Injected,Pulsed,2025771,1,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,2750641,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4622052,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,12517351,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2782759,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4416260,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1149840,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,268253,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,10050367,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,741276,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,746771,0,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,730551,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3727384,1,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,2983238,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,5548330,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,4507460,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1080171,1,none
+240331-BCLLC3-Awake-4T1-Injected_R2_F1,Injected,Regular,2117922,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,3053776,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,1005858,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,1849731,1,none
+231205-BCL12-8-L1210A-20h-12_F1,Injected,Regular,390435,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2505151,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,41039524,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,255060,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,1140153,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,257630,1,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,5539561,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,5052764,0,none
+250515-B6LLC5_Awake_Pulsed_20h_F1,Injected,Pulsed,582867,0,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,12336535,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3470004,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,3294330,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,14033089,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3652748,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2825157,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4392047,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4342335,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4115922,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,1851876,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5395753,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3456554,1,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,1546654,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,696326,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,2293830,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,497748,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,341154,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,5114520,0,none
+250619-B6LLC8_Awake_Pulsed_D7_F1,Injected,Pulsed,7024348,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,2294364,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,32485561,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,9732207,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,129403,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,4064866,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,3964991,0,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,131389,1,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,312849,1,none
+240206- BCMM1-6hr_F1,Injected,Regular,41059697,0,none
+240406-LLC-GFP-e2_R2_F1,Injected,Regular,219110,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4511313,0,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,1083824,0,none
+240206- BCMM1-6hr_F1,Injected,Regular,3213198,0,none
+240906-BC4T1G-21_Awake_R1_F1,Control,Regular,1644715,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5298677,1,none
+231215-BCL12-7-MM-GFP_F1,Injected,Regular,456673,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,9092236,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2165758,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3294474,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3651923,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,305535,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4679816,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2363687,1,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,26818105,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2672840,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,3279070,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,11705603,1,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,11774098,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2315528,1,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,4750472,0,none
+250602-3-LLC-GFP_Run3_F1,Injected,Regular,950022,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,1879827,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,9120435,0,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,541651,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,29377099,1,none
+240903-BC4T1G-20_Anest_R1_F1,Control,Regular,4648811,0,none
+240328-BCLLC2-Awake-Control_R1_F1,Control,Regular,13905347,0,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2460721,1,none
+250603-B6LLC6_Awake_Pulsed_18_F1,Control,Pulsed,5165037,0,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,230735,1,none
+250602-3-LLC-GFP_Run2_F1,Injected,Regular,541315,1,none
+250611-B6LLC8_Awake_Pulsed_16_F1,Control,Pulsed,6049142,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,2872,0,none
+240912-BC4T1G-23_Awake_PBS_15_F1,Control,Regular,10029706,0,none
+240306-BCMM1-6hr_F1,Injected,Regular,34159496,1,none
+240306-BCMM1-6hr_F1,Injected,Regular,14820160,1,none
+231219-BCL12-6-MM-GFP_F1,Injected,Regular,6860406,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,2418440,1,none
+240802-BC4T1G-12_PBS_20h_12_F1,Control,Regular,14286914,0,none
+250430-B6LLC3_Awake_Pulsed_20h_F1,Injected,Pulsed,3257113,1,none
+240321- BCLLC4-LLC-GFP_R1_F1,Injected,Regular,5299295,1,none

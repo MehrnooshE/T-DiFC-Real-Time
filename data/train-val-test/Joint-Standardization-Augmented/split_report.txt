@@ -1,0 +1,90 @@
+### Scans per split, by type
+split                   train  test  val  TOTAL
+scan_type                                      
+Control                    24    16   10     50
+Injected (CTC-bearing)     39    37   37    113
+TOTAL                      63    53   47    163
+
+### Scans per split, by type and setup
+split                           train  test  val  TOTAL
+scan_type              setup                           
+Control                Pulsed      10     5    3     18
+                       Regular     14    11    7     32
+Injected (CTC-bearing) Pulsed      16    15   15     46
+                       Regular     23    22   22     67
+TOTAL                              63    53   47    163
+[NOTE] 73 Injected scan(s) have 0 labeled CTCs (counted as Injected above).
+
+### ORIGINAL CTC windows per split (before balancing/augmentation), by scan type
+split                   train  test  val  TOTAL
+scan_type                                      
+Control                     0     0    0      0
+Injected (CTC-bearing)   2688   433  234   3355
+TOTAL                    2688   433  234   3355
+
+### ORIGINAL artifact windows per split (before balancing/augmentation), by scan type
+split                   train  test   val  TOTAL
+scan_type                                       
+Control                  3161  1709  1210   6080
+Injected (CTC-bearing)    277   591   784   1652
+TOTAL                    3438  2300  1994   7732
+
+### FINAL saved windows per split, by class and augmentation
+split                  train  test  val  TOTAL
+class    augmentation                         
+CTC      flip            349     0    0    349
+         none           2688   433  234   3355
+         smooth          323     0    0    323
+artifact none           3360   433  234   4027
+TOTAL                   6720   866  468   8054
+
+### FINAL saved windows per split, by class and source category
+split              train  test  val  TOTAL
+class    category                         
+CTC      Injected   3360   433  234   4027
+artifact Control    3091   315  128   3534
+         Injected    269   118  106    493
+TOTAL               6720   866  468   8054
+
+### Injected scans per split, by cell line
+split          train  test  val  TOTAL
+cell_line                             
+L1210A             2     4    1      7
+LLC               32    27   27     86
+MM                 4     5    7     16
+MULTI(MM+LLC)      1     1    2      4
+TOTAL             39    37   37    113
+
+### ORIGINAL CTC windows per split, by cell line
+split          train  test  val  TOTAL
+cell_line                             
+L1210A            24    63    5     92
+LLC              230    23  212    465
+MM              2434   347   17   2798
+MULTI(MM+LLC)      0     0    0      0
+TOTAL           2688   433  234   3355
+
+### Recorded hours per split, by type
+split                   train  test   val  TOTAL
+scan_type                                       
+Control                 46.14 31.92 14.34  92.40
+Injected (CTC-bearing)  46.80 54.38 59.74 160.92
+TOTAL                   92.94 86.30 74.07 253.32
+
+### Recorded hours per split, by type and setup
+split                           train  test   val  TOTAL
+scan_type              setup                            
+Control                Pulsed   15.42  6.79  4.05  26.26
+                       Regular  30.72 25.14 10.28  66.14
+Injected (CTC-bearing) Pulsed   16.55 13.49 13.91  43.95
+                       Regular  30.25 40.89 45.83 116.97
+TOTAL                           92.94 86.30 74.07 253.32
+
+### On-time hours per split (excludes Pulsed off-gaps), by type and setup
+split                           train  test   val  TOTAL
+scan_type              setup                            
+Control                Pulsed    3.03  1.36  0.83   5.21
+                       Regular  30.69 25.12 10.28  66.08
+Injected (CTC-bearing) Pulsed    3.46  3.86  4.78  12.10
+                       Regular  30.21 40.76 45.73 116.71
+TOTAL                           67.39 71.09 61.62 200.10
