@@ -9,13 +9,14 @@ The folder is standalone: the code, the labeled training data, the trained model
 ```
 ├── tdifc_app.py               the real-time app (GUI), run from the terminal
 ├── tdifc_app_desktop.py       the same app with a start-up window, for the macOS app (see Desktop app)
-├── tdifc_app_desktop.spec     PyInstaller recipe of "t-DiFC Live.app"
-├── build_mac.sh               builds dist/t-DiFC Live.app and the zip to share
+├── tdifc_app_desktop.spec     PyInstaller recipe of "t-DiFC Live v3.app"
+├── build_mac.sh               builds dist/t-DiFC Live v3.app and the zip to share
 ├── requirements-build.txt     extra packages for the build (PyInstaller)
 ├── train_fusion_torch.py      trains the 5 seeds in PyTorch -> models/
 ├── evaluate_fusion_torch.py   val / test metrics at the 0.6 cut-off; comparison with the Keras seeds
 ├── check_streaming.py         real-time vs offline preprocessing on a recorded file
 ├── simulate_acquisition.py    replays a recorded scan as DiDAQ 10 s chunks (test the app without the DAQ)
+├── latency_report.py          latency DAQ -> window, stage by stage (from tdifc_app.py --latency)
 ├── tdifc/                     library
 │   ├── parameters.py          sampling rate, peak-detection parameters, cut-off (copied from the pipeline)
 │   ├── peak_detection.py      Otsu, laser-ON segments, background removal, peak detection (verbatim copy)
@@ -24,6 +25,7 @@ The folder is standalone: the code, the labeled training data, the trained model
 │   ├── spectral.py            spectral input: centre spectrum, standardizer (copy of fusion_model.py, no TF)
 │   ├── model.py               PyTorch architecture; FusionEnsemble (loads and scores)
 │   ├── streaming.py           causal (real-time) version of the preprocessing
+│   ├── latency.py             timing log of tdifc_app.py --latency (file times, NAS clock probe)
 │   ├── metrics.py             metrics, scan-level bootstrap (copy of common.py)
 │   └── paths.py               folder paths, split loading
 ├── data/
@@ -84,9 +86,9 @@ python tdifc_app.py --save_dir "/Volumes/Public/Jane/Balbc MM" --exp_name "25072
 
 The mode is shown in the window title and written to `summary.json` (`analysis`) and to `candidates.csv` (`analysed_as` per candidate). On 4 h of BCMM1 with no new data: `offline` 26 s, `offline-then-real-time` 40 s (both 516 candidates, 385 detected), `real-time` 45 s (524 candidates, 384 detected, identical to the real-time analysis from t = 0).
 
-Options: `--mode auto|pulsed|continuous` (laser illumination; default auto, decided from the last 5 min of Ch1), `--out_dir` (default `results/<exp_name>/`), `--cut_off` (default 0.6, from the model file), `--y_min / --y_max` (trace range, mV; default 0–2500), `--model`, `--log_level`. Other settings are at the top of `tdifc_app.py`.
+Options: `--mode auto|pulsed|continuous` (laser illumination; default auto, decided from the last 5 min of Ch1), `--out_dir` (default `results/<exp_name>/`), `--cut_off` (default 0.6, from the model file), `--rel_thresh` (relative peak threshold: a Ch1 candidate must rise above this multiple of the background std; default 4.5, the value the model was trained with — lower gives more, weaker candidates for the model to score; used by the real-time and the offline analysis and saved in `summary.json`), `--y_min / --y_max` (trace range, mV; default 0–2500), `--model`, `--log_level`. Other settings are at the top of `tdifc_app.py`.
 
-**Window.** Top: the status line (laser mode, time recorded, laser-ON time, candidates and detected peaks so far) and the raw Ch1 / Ch2 trace of the last 60 s; every candidate is highlighted with its probability (red: detected, p ≥ 0.6; grey: rejected) when the view shows 10 min or less (only the candidates in and next to the view are drawn, so panning stays fast however long the recording). The trace is full resolution (every sample) during laser-ON; with the pulsed laser, the laser-OFF gaps are drawn as 0 (their signal is not used by the analysis), which keeps about 4x less data. The time axis reads as a recording clock (h:mm:ss). Drag / scroll to move along time (last hour kept), **A** (bottom left) shows the whole hour; in a view wider than 10 min, click a laser pulse to zoom to it (the pulse ± 2 s, with its candidates highlighted). **Reset view** returns to the newest data and follows it again. **🔍 Magnifier** opens a panel beside the trace (the trace gets narrower) and a 2-s window on the trace that follows the cursor while it is over the trace, and stays where it was when the cursor leaves. Click the trace to stop its live scrolling there; the window keeps following the cursor over the stopped trace (**Reset view** returns to live). The panel shows Ch1 and Ch2 in the window at full resolution, each on its own y-axis that auto-scales to the window. With **fixed y (per pulse)** ticked (under the Magnifier button), each y-axis is instead fixed to the min / max of the laser-ON pulse under the window (without its first / last 25 ms, + 5%), so the scale does not change while the window moves inside a pulse; over a laser-OFF gap it is automatic, with the continuous laser it is set per 60-s block. Candidates in the window are marked with their probability. Showing a candidate (barcode, highlight, review panel) moves the window onto it. **⏸ Pause** stops reading new chunks (after the one in progress); the DAQ keeps saving them, the status line shows how long processing has been paused and how much data is waiting (e.g. *4.0 h of data waiting*), and the window stays usable (review, magnifier, saving). **▶ Resume** catches up on the waiting chunks (about 70x real time) and continues; nothing is skipped, the results are the same as without the pause. Pause also works while the saved data is being analysed offline at start-up: it takes effect at the next chunk read, before a block's preprocessing or between its scoring batches (within a few seconds), the status line then counts everything not analysed yet, and Resume continues the offline analysis where it stopped. Display settings (`DISPLAY_BIN`, `DISPLAY_OFF_AS_ZERO`, history length) are at the top of `tdifc_app.py`. Middle: barcode of all detected peaks since the start (time axis in whole hours), **Save barcode** as PNG. Click a barcode line or a highlight to jump there and show the candidate's 1-s window (background-subtracted Ch1 / Ch2, full resolution) with its time, sample, probability, laser-edge flag and file; **Save clip** as PNG, ✕ closes it.
+**Window.** Top: the status line (laser mode, time recorded, laser-ON time, candidates and detected peaks so far) and the raw Ch1 / Ch2 trace of the last 60 s; every candidate is highlighted with its probability (red: detected, p ≥ 0.6; grey: rejected) when the view shows 10 min or less (only the candidates in and next to the view are drawn, so panning stays fast however long the recording). The trace is full resolution (every sample) during laser-ON; with the pulsed laser, the laser-OFF gaps are drawn as 0 (their signal is not used by the analysis), which keeps about 4x less data. The time axis reads as a recording clock (h:mm:ss). Drag / scroll to move along time (last hour kept), **A** (bottom left) shows the whole hour; in a view wider than 10 min, click a laser pulse to zoom to it (the pulse ± 2 s, with its candidates highlighted). **Reset view** returns to the newest data and follows it again. **🔍 Magnifier** opens a panel beside the trace (the trace gets narrower) and a 2-s window on the trace that follows the cursor while it is over the trace, and stays where it was when the cursor leaves. Click the trace to stop its live scrolling there; the window keeps following the cursor over the stopped trace (**Reset view** returns to live). The panel shows Ch1 and Ch2 in the window at full resolution, each on its own y-axis that auto-scales to the window. With **fixed y (per pulse)** ticked (under the Magnifier button), each y-axis is instead fixed to the min / max of the laser-ON pulse under the window (without its first / last 25 ms, + 5%), so the scale does not change while the window moves inside a pulse; over a laser-OFF gap it is automatic, with the continuous laser it is set per 60-s block. Candidates in the window are marked with their probability. Showing a candidate (barcode, highlight, review panel) moves the window onto it. **⏸ Pause** stops reading new chunks (after the one in progress); the DAQ keeps saving them, the status line shows how long processing has been paused and how much data is waiting (e.g. *4.0 h of data waiting*), and the window stays usable (review, magnifier, saving). **▶ Resume** catches up on the waiting chunks (about 70x real time) and continues; nothing is skipped, the results are the same as without the pause. Pause also works while the saved data is being analysed offline at start-up: it takes effect at the next chunk read, before a block's preprocessing or between its scoring batches (within a few seconds), the status line then counts everything not analysed yet, and Resume continues the offline analysis where it stopped. Display settings (`DISPLAY_BIN`, `DISPLAY_OFF_AS_ZERO`, history length) are at the top of `tdifc_app.py`. Middle: barcode of all detected peaks since the start (time axis in whole hours), **Save barcode** as PNG. Click a barcode line or a highlight to jump there and show the candidate's 1-s window (full resolution) in three tabs: **BG subtracted** (Ch1 / Ch2 minus the 2-s rolling median, mV), **ALS residual** (the window jointly standardized, minus each channel's ALS baseline, without Ch2 scaling; made when the candidate is shown) and **ALS → Ch2 scaled** (the classifier's input: the ALS residual with Ch2 then scaled to Ch1's background std), with its time, sample, probability, laser-edge flag and file; **Save clip** saves the tab shown as PNG, ✕ closes it.
 
 **Reviewing calls.** The panel right of the clip steps through the candidates of one set: detected peaks, near misses (0.5 ≤ p < cut-off), all rejected, all candidates, or *Reviewed* (the ones you have already judged). **⏮ First / ◀ Prev / Next ▶ / Latest ⏭** move through the set in time order (keys Home, ←, →, End); the counter shows the candidate's position in the set and how many are left to review. For the candidate on screen, **✓ Peak** (Y) or **✗ Artifact** (N) records your verdict; pressing the other button changes it, the same button again clears it. *skip reviewed* leaves out candidates already judged (not in the *Reviewed* set), *next after verdict* moves on automatically. The panel counts what has been reviewed: of the detected peaks, how many you confirmed (a live precision estimate); of the near misses and the other rejected candidates, how many you judged to be peaks (missed peaks). Verdicts go to `results/<exp_name>/review.csv` (see below). The app always uses a light theme, also when macOS is in dark mode.
 
@@ -104,9 +106,23 @@ python tdifc_app.py --save_dir sim --exp_name TEST
 
 `--speed 10` writes a 10 s chunk every second (`0` = all at once); `--layout single` puts both channels in F1; `--start_min`, `--minutes` select part of the recording; several `--mat` files are replayed one after the other; `--first_chunk` continues the numbering of an earlier run (e.g. first write 3 h at `--speed 0` as already-saved data, start the app, then add live chunks).
 
+**Latency (DAQ → window).** `python tdifc_app.py ... --latency` times every chunk on its way from the DAQ to the window, without any change to DiDAQ: the save time MATLAB writes into each `.mat` header (DAQ laptop clock), the file's creation time on the NAS (NAS clock), and this computer's clock when the app finds, loads, preprocesses, scores and draws the chunk. Every 10 min the app also reads the NAS clock by creating and deleting a small file next to the experiment folder (`--clock_probe_dir` to put it elsewhere). Results: `latency_chunks.csv`, `latency_candidates.csv`, `latency_clock.csv` in the results folder. Summarize with
+
+```
+python latency_report.py results/<exp_name> --laptop_clock_file /Volumes/Public/laptop_clock.txt
+```
+
+The DAQ laptop's clock cannot be read from here (in July 2025 it was ~13 min off the NAS). Run this on the laptop just before or after the recording, writing straight to the NAS (not into the synced folder):
+
+```
+(Get-Date).ToString("o") | Set-Content -Encoding ascii "\\129.10.224.25\Public\laptop_clock.txt"
+```
+
+or give the difference as `--laptop_minus_nas <s>`. Without either, the laptop → NAS sync time and the totals are lower bounds (the fastest sync is taken as 0 s). The report splits the time into: A waiting for the 10-s chunk to fill, B saving on the laptop, C sync to the NAS, D the app finding the file (1-s polling), E loading, F preprocessing, G scoring, H drawing, and W the detector waiting for a later chunk (end of the laser-ON segment). Times involving the DAQ laptop are ±0.5 s (the header has whole seconds). `python latency_report.py --history "<experiment folder>" --every 10` gives B and the NAS − laptop difference for a past recording from its files alone. Only `tdifc_app.py` has `--latency` (not the desktop app).
+
 ## Desktop app (macOS)
 
-`tdifc_app_desktop.py` is `tdifc_app.py` with a start-up window, packaged as **t-DiFC Live.app**, so the app can be shared with people who do not use the terminal (no Python or environment needed).
+`tdifc_app_desktop.py` is `tdifc_app.py` with a start-up window, packaged as **t-DiFC Live v3.app**, so the app can be shared with people who do not use the terminal (no Python or environment needed).
 
 **Build** (on a Mac, in this folder, with the environment of *Setup*):
 
@@ -114,19 +130,19 @@ python tdifc_app.py --save_dir sim --exp_name TEST
 ./build_mac.sh
 ```
 
-It takes about 3 min and writes `dist/t-DiFC Live.app` (~500 MB, PyTorch included) and **`dist/t-DiFC-Live-mac-arm64.zip`** (~180 MB), the file to share (e.g. as a GitHub Release asset or by Teams / OneDrive). A build on Apple silicon runs on Apple-silicon Macs (M1 or later, macOS 12+); build on an Intel Mac for Intel Macs. `build/` and `dist/` are not committed.
+It takes about 3 min and writes `dist/t-DiFC Live v3.app` (~500 MB, PyTorch included) and **`dist/t-DiFC-Live-v3-mac-arm64.zip`** (~180 MB), the file to share (e.g. as a GitHub Release asset or by Teams / OneDrive). A build on Apple silicon runs on Apple-silicon Macs (M1 or later, macOS 12+); build on an Intel Mac for Intel Macs. `build/` and `dist/` are not committed.
 
-**Use.** Unzip, move *t-DiFC Live* to Applications and double-click it. The start-up window asks for:
+**Use.** Unzip, move *t-DiFC Live v3* to Applications and double-click it. The start-up window asks for:
 - **Data**: the experiment folder DiDAQ writes into (the one with `F1`, `F2`, …; choosing `F1` itself also works). The experiment name is read from the chunk files, and the window shows what it found (e.g. *7490 chunk files, about 20.8 h*). A folder that is still empty is fine: the app waits for DiDAQ.
 - **Analysis**: real time (default), offline then real time, or offline only (as `--analysis`).
 - **Results**: by default `~/Documents/t-DiFC results/<experiment name>/`, with `candidates.csv`, `summary.json`, `review.csv` and the log `tdifc_app.log`.
-- **Advanced options**: laser illumination, fiber folders, probability cut-off, signal y-range.
+- **Advanced options**: laser illumination, fiber folders, probability cut-off, relative threshold (× background std, default 4.5), signal y-range.
 
 **Start** opens the main window (as `tdifc_app.py`). The choices are remembered for the next start. From the terminal, the desktop version still takes the options of `tdifc_app.py`; with `--save_dir` and `--exp_name` it skips the start-up window.
 
-**First start on another Mac.** The app is not signed with an Apple Developer ID, so macOS blocks it the first time: *"t-DiFC Live" cannot be opened* (or *Apple could not verify…*). Once per Mac:
+**First start on another Mac.** The app is not signed with an Apple Developer ID, so macOS blocks it the first time: *"t-DiFC Live v3" cannot be opened* (or *Apple could not verify…*). Once per Mac:
 - macOS 14 and older: right-click (Control-click) the app → **Open** → **Open**.
-- macOS 15 and newer: double-click once, then **System Settings → Privacy & Security**, scroll down to *"t-DiFC Live" was blocked* → **Open Anyway**.
+- macOS 15 and newer: double-click once, then **System Settings → Privacy & Security**, scroll down to *"t-DiFC Live v3" was blocked* → **Open Anyway**.
 
 macOS then asks once for access to the network volume (NAS) and the Documents folder: allow both. (Signing and notarizing the app with an Apple Developer account removes the warning.)
 

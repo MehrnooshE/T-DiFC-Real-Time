@@ -1,9 +1,9 @@
-# PyInstaller spec of the macOS app "t-DiFC Live.app" (tdifc_app_desktop.py). Build with ./build_mac.sh.
+# PyInstaller spec of the macOS app "t-DiFC Live v3.app" (tdifc_app_desktop.py). Build with ./build_mac.sh.
 # One folder bundle (a one-file .app starts slower and macOS handles it badly); the model is bundled.
 # -*- mode: python ; coding: utf-8 -*-
 
-APP = "t-DiFC Live"
-VERSION = "1.0.0"
+APP = "t-DiFC Live v3"
+VERSION = "3.0.0"
 
 a = Analysis(
     ["tdifc_app_desktop.py"],

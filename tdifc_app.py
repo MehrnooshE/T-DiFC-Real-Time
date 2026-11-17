@@ -68,7 +68,9 @@ from pyqtgraph.Qt import QtWidgets, QtCore, QtGui
 from tdifc import paths, parameters as var
 from tdifc.model import FusionEnsemble
 from tdifc.streaming import StreamProcessor, looks_pulsed
-from tdifc import peak_detection as pkd, scan_preprocessing as scp
+from tdifc import peak_detection as pkd, scan_preprocessing as scp, spectral as spc
+from tdifc import signal_functions as sigf
+from tdifc.latency import LatencyLog
 
 # ─────────────────────────────────────────────────────────────────────────────
 # LOGGING
@@ -127,6 +129,7 @@ CLEARANCE_SKIP_MIN   = 0        # default: first X min left out of the exponenti
 
 MODEL_PATH           = paths.MODEL_PATH
 PROB_THRESHOLD       = var.cut_off   # replaced by the cut-off stored in the model file
+DEFAULT_REL_THRESH   = var.rel_thresh[0]   # peak threshold (x background std) the model was trained with
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SHARED QUEUE  - worker puts plot-ready dicts, GUI timer reads them
@@ -557,6 +560,9 @@ class Worker(threading.Thread):
         self.counts = dict(candidates=0, detected=0, detected_not_at_laser_edge=0)
         self.backlog = None         # what the offline analysis of the saved data did (summary.json)
         self._y = dict(n=0, max=-np.inf, seen=set(), done=False)   # signal maximum at the start
+        self.lat = None             # LatencyLog (--latency): timing of every chunk, DAQ -> window
+        self._lat_waited = None     # the chunk the worker last found missing (it then arrived live)
+        self._lat_seen = None       # (time the next chunk was found ready, live)
         os.makedirs(out_dir, exist_ok=True)
         self.csv_path = os.path.join(out_dir, "candidates.csv")
         with open(self.csv_path, "w") as f:
@@ -603,10 +609,12 @@ class Worker(threading.Thread):
                         return                              # no new data is read
                     continue
                 if self.src.ready(self.next_idx):
+                    self._lat_seen = (time.time(), self._lat_waited == self.next_idx)
                     self._handle_chunk(self.next_idx)
                     self.next_idx += 1
                     waiting_since = None
                     continue
+                self._lat_waited = self.next_idx
                 later = any(self.src.ready(self.next_idx + k) for k in range(1, 6))
                 if later:
                     waiting_since = waiting_since or time.time()
@@ -821,14 +829,16 @@ class Worker(threading.Thread):
             s1, s2, pk, info = (scp.preprocess_pulsed if pulsed else scp.preprocess_regular)(df)
             raw, X, M = scp.build_windows(s1, s2, pk)
             edge = scp.edge_distance_ms(M) <= scp.EDGE_MS if len(pk) else np.empty(0, bool)
-            probs = []
+            probs, als = [], []
             for a in range(0, len(pk), 200):                  # batch scoring: the last half of the bar
                 self._wait_if_paused()
                 self._block_progress(t0, t1, f"scoring the candidates ({a} of {len(pk)})", 0.5 + 0.5 * a / len(pk))
-                probs.append(self.model.predict(X[a:a + 200], M[a:a + 200]))
+                als.append(spc.als_scaled(X[a:a + 200], progress=False))   # model input, also shown
+                probs.append(self.model.predict(X[a:a + 200], M[a:a + 200], als=als[-1]))
             probs = np.concatenate(probs) if probs else np.empty(0)
+            als = np.concatenate(als) if als else np.empty((0, 2, scp.WIN_LEN), np.float32)
             self._block_progress(t0, t1, f"done ({len(pk)} candidates)", 1.0)
-            cands = self._record(start + pk, probs, raw, edge, mode, "offline")
+            cands = self._record(start + pk, probs, raw, edge, mode, "offline", als=als)
             self._on_off += int(round(info["on_hours"] * 3600 * fs))
             log_worker.info("offline block %d: %.2f h %s, %d candidates, %d detected", self._block_no + 1,
                             H / fs / 3600, mode, len(pk), int((probs >= self.cut_off).sum()) if len(pk) else 0)
@@ -870,15 +880,17 @@ class Worker(threading.Thread):
         return np.concatenate(ts), np.vstack(ds)
 
     # ------------------------------------------------- candidates and summary ---
-    def _record(self, peaks, probs, raw, edge, mode, analysed_as):
-        """Candidate dicts for the GUI and rows in candidates.csv."""
+    def _record(self, peaks, probs, raw, edge, mode, analysed_as, als=None):
+        """Candidate dicts for the GUI and rows in candidates.csv. raw: background-subtracted windows
+        (mV); als: the model's input windows (joint standardization, ALS baseline removed, Ch2 scaled)."""
         cands, rows = [], []
         for k, p in enumerate(peaks):
             t_s, chunk, fname = self._time_of(int(p))
             det = bool(probs[k] >= self.cut_off)
             cands.append({"t": float(t_s), "prob": float(probs[k]), "edge": bool(edge[k]),
                           "sample": int(round(t_s * SAMPLING_RATE)), "file": fname,
-                          "clip_d": raw[k].T.astype(np.float32)})
+                          "clip_d": raw[k].T.astype(np.float32),
+                          "clip_als": als[k].T.astype(np.float32) if als is not None else None})
             rows.append([int(round(t_s * SAMPLING_RATE)), f"{t_s:.4f}", f"{t_s / 3600:.6f}", chunk, fname,
                          mode, bool(edge[k]), f"{probs[k]:.6f}", det, analysed_as])
             self.counts["candidates"] += 1
@@ -899,7 +911,8 @@ class Worker(threading.Thread):
                    "laser_mode": mode, "otsu_threshold": otsu,
                    "laser_on_hours": round(on_h, 4), **self.counts,
                    "peaks_per_laser_on_hour": round(self.counts["detected"] / on_h, 2) if on_h else None,
-                   "cut_off": self.cut_off, "model": os.path.basename(self.model_path),
+                   "cut_off": self.cut_off, "rel_thresh": var.rel_thresh[0],
+                   "model": os.path.basename(self.model_path),
                    "analysis": self.analysis, "saved_data_analysed_offline": self.backlog,
                    "finished": self.finished,
                    "updated": time.strftime("%Y-%m-%d %H:%M:%S")}
@@ -957,14 +970,21 @@ class Worker(threading.Thread):
     def _handle_chunk(self, idx):
         """One new file in real time. A file longer than RT_SLICE_SECS (e.g. 10-s chunks stitched
         together) is fed in RT_SLICE_SECS slices, as if DiDAQ had written it chunk by chunk."""
+        seen, live = self._lat_seen or (time.time(), False)
+        self._lat_seen = None
         try:
             ch1, ch2, tvec, names = self.src.load(idx)
         except ChunkReadError as e:
             self._read_error(idx, e)
             return
+        t_loaded = time.time()
         self._y_check(idx, ch1, ch2)
         n, step = len(ch1), int(RT_SLICE_SECS * SAMPLING_RATE)
         n_sl = int(np.ceil(n / step)) if n > 1.5 * step else 1
+        lat = None                                  # timing only for a chunk analysed in one piece
+        if self.lat is not None and n_sl == 1:
+            lat = self.lat.new(idx, live, seen)
+            self.lat.mark(lat, "loaded", t_loaded)
         if n_sl > 1:
             log_scan.info("%s: %.2f h in one file - analysed in %d slices of %d s", names[0],
                           n / SAMPLING_RATE / 3600, n_sl, RT_SLICE_SECS)
@@ -975,7 +995,7 @@ class Worker(threading.Thread):
                 if self.stop_event.is_set():
                     return
             tv = tvec[a:b] if tvec is not None and len(tvec) >= n else (tvec if k == 0 else None)
-            self._rt_piece(idx, ch1[a:b], ch2[a:b], tv, names, (k + 1) / n_sl, n)
+            self._rt_piece(idx, ch1[a:b], ch2[a:b], tv, names, (k + 1) / n_sl, n, lat=lat)
 
     def _wait_slice(self, left):
         """Pause pressed while a long file is fed in slices: wait between two slices."""
@@ -987,21 +1007,32 @@ class Worker(threading.Thread):
                 last = time.time()
             time.sleep(0.2)
 
-    def _rt_piece(self, idx, ch1, ch2, tvec, names, file_frac, file_n):
-        """Real-time analysis of one 10-s piece (a whole DiDAQ chunk, or a slice of a longer file)."""
+    def _rt_piece(self, idx, ch1, ch2, tvec, names, file_frac, file_n, lat=None):
+        """Real-time analysis of one 10-s piece (a whole DiDAQ chunk, or a slice of a longer file).
+        lat: the chunk's LatencyLog id (--latency), else None."""
         n0, t_disp = self._add_chunk(idx, len(ch1), tvec, names[0])
         assert n0 == self.stream.n, "chunk table and stream out of step"
         time0 = float(t_disp[0])
         self.stream.append(ch1, ch2)
         res = self.stream.process()
         t_plot, d_plot = display_chunk(t_disp, np.stack([ch1, ch2], 1), self.stream.mode, self.stream.otsu)
-        cands = []
+        if lat is not None:
+            self.lat.mark(lat, "processed", n_samples=len(ch1), t_first_s=time0, t_last_s=float(t_disp[-1]))
+        cands, lat_rows = [], []
         if len(res["peaks"]):
             t_start = time.time()
-            probs = self.model.predict(res["X"], res["M"])
+            als = spc.als_scaled(res["X"], progress=False)  # model input, also shown in the clip panel
+            probs = self.model.predict(res["X"], res["M"], als=als)
             log_ml.info("chunk %d: %d candidates scored in %.2f s (%d detected)", idx, len(res["peaks"]),
                         time.time() - t_start, int((probs >= self.cut_off).sum()))
-            cands = self._record(res["peaks"], probs, res["raw"], res["edge"], res["mode"], "real-time")
+            cands = self._record(res["peaks"], probs, res["raw"], res["edge"], res["mode"], "real-time",
+                                 als=als)
+            if lat is not None:                     # the chunk each peak is in (reported now, after idx)
+                lat_rows = [(self._time_of(int(p))[1], c["sample"], c["t"], c["prob"], c["prob"] >= self.cut_off)
+                            for p, c in zip(res["peaks"], cands)]
+        if lat is not None:
+            self.lat.mark(lat, "scored", n_candidates=len(cands),
+                          n_detected=sum(c["prob"] >= self.cut_off for c in cands))
         summary = self._write_summary(idx, res["mode"], res["otsu"])
         rt = getattr(self, "_rt_saved", None)              # --analysis real-time: the saved part's progress
         if rt and rt[1]:
@@ -1025,7 +1056,12 @@ class Worker(threading.Thread):
             "cands"     : cands,
             "final_t"   : self._time_of(res["stop"])[0] if res["stop"] > 0 else time0,
             "summary"   : summary,
+            "lat_id"    : lat,
         })
+        if lat is not None:                         # after the queue: off the critical path
+            self.lat.mark(lat, "queued")
+            self.lat.candidates(lat, idx, lat_rows)
+            self.lat.file_times(lat, self.src.root, names)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1227,7 +1263,7 @@ class TDiFCWindow:
         self._reviews = self._load_reviews()     # sample -> 1 (peak) / 0 (artifact)
         self._current = None                      # candidate shown in the review tab
         self._curves = []
-        self._clip_curves = []
+        self._clip_curves = [[] for _ in self.CLIP_VIEWS]   # per clip tab
         pts_per_s = (2 * SAMPLING_RATE / DISPLAY_BIN if DISPLAY_BIN > 2
                      else 0.3 * SAMPLING_RATE if DISPLAY_OFF_AS_ZERO else SAMPLING_RATE)   # pulsed: ~25% ON
         self._buf = DisplayBuffer(capacity=int((DISPLAY_HISTORY_SECS + TRIM_STEP_SECS + 60) * pts_per_s))
@@ -1643,6 +1679,18 @@ class TDiFCWindow:
             return
         self._show_candidate(c)
 
+    # clip tabs: (candidate key, tab, y label, tooltip, file suffix of Save clip)
+    CLIP_VIEWS = (
+        ("clip_d", "BG subtracted", "Signal - background (mV)",
+         "2-s rolling-median background subtracted (the signal the peaks are detected on)", ""),
+        ("clip_als_res", "ALS residual", "Standardized signal",
+         "Joint standardization of Ch1 + Ch2, then each channel minus its ALS baseline (no Ch2 scaling): "
+         "what the ALS step leaves", "_als_residual"),
+        ("clip_als", "ALS → Ch2 scaled", "Standardized signal",
+         "Joint standardization of Ch1 + Ch2, ALS baseline removed, then Ch2 scaled to Ch1's background "
+         "std: the window the classifier sees", "_model_input"),
+    )
+
     def _show_candidate(self, c):
         """Pan the signal plot to candidate c and show its 1 s window and details."""
         self._user_panned = True
@@ -1650,28 +1698,54 @@ class TDiFCWindow:
         self._current = c
         if self._mag_region is not None:                      # magnifier on the candidate too
             self._place_magnifier(c["t"])
-        clip_d = c["clip_d"]
-        clip_t = c["t"] + (np.arange(len(clip_d)) - len(clip_d) // 2) / SAMPLING_RATE
-        n_ch = clip_d.shape[1]
-        if len(self._clip_curves) != n_ch:
-            for crv in self._clip_curves:
-                self.clip_plot.removeItem(crv)
-            self._clip_curves = [None] * n_ch
-            for ch in range(n_ch - 1, -1, -1):     # Ch2 first (bottom), Ch1 on top
-                self._clip_curves[ch] = self.clip_plot.plot(
-                    pen=pg.mkPen(self.CH_COLORS[ch % len(self.CH_COLORS)], width=1), name=f"Ch{ch + 1}")
-        for ch, crv in enumerate(self._clip_curves):
-            crv.setData(clip_t, clip_d[:, ch])
-        self.clip_plot.setXRange(float(clip_t[0]), float(clip_t[-1]), padding=0.0)
-        self.clip_plot.enableAutoRange(axis="y", enable=True)
-        self.clip_plot.getAxis("bottom").setTicks([[(c["t"], f"{c['sample']}")], []])
+        if c.get("clip_als_res") is None:          # display only: made when first shown (~20 ms)
+            c["clip_als_res"] = self._als_residual(c["clip_d"])
+        for v, (plot, view) in enumerate(zip(self._clip_plots, self.CLIP_VIEWS)):
+            self._draw_clip(v, plot, c, c.get(view[0]))
         self._update_clip_info()
-        self._clip_stack.setCurrentWidget(self._clip_win)
+        self._clip_stack.setCurrentWidget(self._clip_tabs)
         self._clip_info_box.setVisible(True)
         self._save_clip_btn.setEnabled(True)
         if self._side_tabs.currentIndex() != 0:
             self._side_tabs.setCurrentIndex(0)                # show it in the Review tab
         self._update_review_panel()
+
+    @staticmethod
+    def _als_residual(clip_d):
+        """Clip tab 2: the window jointly standardized (as the model's), minus each channel's ALS
+        baseline - the first step of the model's spectral input, before Ch2 is scaled
+        (signal_functions.ALS_BGremoved_Ch2scaled, same settings). samples x channels."""
+        try:
+            w = clip_d.T.astype(np.float64)
+            X = scp.standardize_joint(w, invalid_mask=scp.compute_invalid_mask(w))
+            out = sigf.remove_baseline(pd.DataFrame(X.T, columns=["Ch1", "Ch2"]), method="als",
+                                       crop_dead_time=True)
+            return out[["Ch1_corrected", "Ch2_corrected"]].to_numpy(np.float32)
+        except Exception as e:                    # display only: never stops the review
+            log_app.warning("ALS residual view failed: %s", e)
+            return None
+
+    def _draw_clip(self, v, plot, c, clip):
+        """One clip tab: the candidate's 1-s window (samples x channels); None -> empty."""
+        curves = self._clip_curves[v]
+        if clip is None:
+            for crv in curves:
+                crv.setData([], [])
+            return
+        clip_t = c["t"] + (np.arange(len(clip)) - len(clip) // 2) / SAMPLING_RATE
+        n_ch = clip.shape[1]
+        if len(curves) != n_ch:
+            for crv in curves:
+                plot.removeItem(crv)
+            curves = self._clip_curves[v] = [None] * n_ch
+            for ch in range(n_ch - 1, -1, -1):     # Ch2 first (bottom), Ch1 on top
+                curves[ch] = plot.plot(pen=pg.mkPen(self.CH_COLORS[ch % len(self.CH_COLORS)], width=1),
+                                       name=f"Ch{ch + 1}")
+        for ch, crv in enumerate(curves):
+            crv.setData(clip_t, clip[:, ch])
+        plot.setXRange(float(clip_t[0]), float(clip_t[-1]), padding=0.0)
+        plot.enableAutoRange(axis="y", enable=True)
+        plot.getAxis("bottom").setTicks([[(c["t"], f"{c['sample']}")], []])
 
     def _update_clip_info(self):
         c = self._current
@@ -1873,26 +1947,36 @@ class TDiFCWindow:
 
         # the candidate: 1-s window + details
         self._save_clip_btn = self._button("💾  Save clip", self._save_clip, height=22,
-                                           tip="Save the 1-s window as PNG")
+                                           tip="Save the 1-s window shown (this tab) as PNG")
         self._save_clip_btn.setEnabled(False)
-        lay.addWidget(self._section("Candidate", "1-s window, background removed", self._save_clip_btn))
+        lay.addWidget(self._section("Candidate", "1-s window", self._save_clip_btn))
         self._clip_stack = QtWidgets.QStackedWidget()
-        self._clip_stack.setFixedHeight(230)
+        self._clip_stack.setFixedHeight(256)          # 230 plot + the clip tabs
         ph = QtWidgets.QLabel("Click a highlight on the signal or a line on the barcode,\n"
                               "or press Next ▶ to step through the calls.")
         ph.setObjectName("muted")
         ph.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         ph.setStyleSheet("QLabel { border:1px dashed #c9ced6; border-radius:6px; }")
         self._clip_stack.addWidget(ph)
-        self._clip_win = pg.GraphicsLayoutWidget()
-        self._clip_win.setBackground("w")
-        self._clip_win.ci.setContentsMargins(0, 0, 0, 0)
-        self.clip_plot = self._clip_win.addPlot(row=0, col=0, axisItems={"bottom": TimeAxis(orientation="bottom")})
-        self.clip_plot.setLabel("left", "Signal - background (mV)")
-        self.clip_plot.getAxis("left").enableAutoSIPrefix(False)
-        self.clip_plot.showGrid(x=False, y=False)
-        self.clip_plot.addLegend(offset=(5, 5))
-        self._clip_stack.addWidget(self._clip_win)
+        # two views of the window: background removed (mV), and the model's input (joint
+        # standardization, ALS baseline removed, Ch2 scaled to Ch1's background std)
+        self._clip_tabs = QtWidgets.QTabWidget()
+        self._clip_tabs.setDocumentMode(True)
+        self._clip_tabs.setStyleSheet("QTabBar::tab { font-size:11px; padding:2px 10px; margin-right:2px; }")
+        self._clip_wins, self._clip_plots = [], []
+        for _key, tab, ylabel, tip, _suffix in self.CLIP_VIEWS:
+            win = pg.GraphicsLayoutWidget()
+            win.setBackground("w")
+            win.ci.setContentsMargins(0, 0, 0, 0)
+            plot = win.addPlot(row=0, col=0, axisItems={"bottom": TimeAxis(orientation="bottom")})
+            plot.setLabel("left", ylabel)
+            plot.getAxis("left").enableAutoSIPrefix(False)
+            plot.showGrid(x=False, y=False)
+            plot.addLegend(offset=(5, 5))
+            self._clip_tabs.setTabToolTip(self._clip_tabs.addTab(win, tab), tip)
+            self._clip_wins.append(win)
+            self._clip_plots.append(plot)
+        self._clip_stack.addWidget(self._clip_tabs)
         lay.addWidget(self._clip_stack)
         info = QtWidgets.QFrame()
         info.setObjectName("infobox")
@@ -2347,12 +2431,13 @@ class TDiFCWindow:
         if c is None:
             log_app.warning("No clip to save - click a peak first")
             return
-        name = f"peak_{c['sample']}_{c['prob']:.3f}.png"
+        v = self._clip_tabs.currentIndex()                      # the tab shown
+        name = f"peak_{c['sample']}_{c['prob']:.3f}{self.CLIP_VIEWS[v][4]}.png"
         path, _ = QtWidgets.QFileDialog.getSaveFileName(
             None, "Save clip", os.path.join(self.out_dir, name), "PNG (*.png)")
         if path:
             try:
-                self._clip_win.grab().save(path)
+                self._clip_wins[v].grab().save(path)
                 log_app.info("Clip saved to %s", path)
             except Exception as e:
                 log_app.error("Save clip failed: %s", e)
@@ -2372,7 +2457,7 @@ class TDiFCWindow:
     # --------------------------------------------------------------- update ---
     def _drain(self):
         """Apply every queued update (a backlog at start-up is caught up quickly), then redraw once."""
-        n, t0 = 0, time.time()
+        n, t0, lat_ids = 0, time.time(), []
         while time.time() - t0 < 0.1:                  # short: a click never waits long behind a backlog
             try:
                 p = PLOT_QUEUE.get_nowait()
@@ -2409,8 +2494,13 @@ class TDiFCWindow:
                 continue
             self._apply(p)
             n += 1
+            if p.get("lat_id") is not None:
+                lat_ids.append(p["lat_id"])
         if n:
             self._redraw()
+        lat = getattr(self.worker, "lat", None)
+        if lat_ids and lat is not None:                # drawn: when the event loop is back after the redraw
+            QtCore.QTimer.singleShot(0, lambda ids=lat_ids: lat.drawn(ids))
 
     def _auto_y_max(self, peak):
         """The signal at the start goes above the trace's y limit: raise the limit to it + margin."""
@@ -2632,9 +2722,18 @@ def main():
     ap.add_argument("--out_dir", default=None, help="results folder (default: results/<exp_name>/ here)")
     ap.add_argument("--model", default=MODEL_PATH)
     ap.add_argument("--cut_off", type=float, default=None, help="probability cut-off (default: the model's, 0.6)")
+    ap.add_argument("--rel_thresh", type=float, default=None,
+                    help=f"relative peak threshold: Ch1 candidates above this x the background std "
+                         f"(default {var.rel_thresh[0]:g}, as in training)")
     ap.add_argument("--y_min", type=float, default=TRACE_Y_MIN)
     ap.add_argument("--y_max", type=float, default=TRACE_Y_MAX)
     ap.add_argument("--log_level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    ap.add_argument("--latency", action="store_true",
+                    help="time every chunk from the DAQ to the window -> latency_*.csv in the results folder "
+                         "(summarize with latency_report.py)")
+    ap.add_argument("--clock_probe_dir", default=None,
+                    help="--latency: folder on the NAS where a small file is created and deleted every 10 min "
+                         "to read the NAS clock (default: the folder that contains the experiment folder)")
     args = ap.parse_args()
     if args.folder:                                 # any folder: root = it, name = its own
         args.root = os.path.abspath(os.path.expanduser(args.folder.rstrip("/")))
@@ -2644,6 +2743,12 @@ def main():
         ap.error("give --save_dir and --exp_name, or --folder")
     logging.getLogger().setLevel(args.log_level)
     TRACE_Y_MIN, TRACE_Y_MAX = args.y_min, args.y_max
+    if args.rel_thresh is not None:                 # peak detection (real time and offline) reads it
+        if args.rel_thresh <= 0:
+            ap.error("--rel_thresh must be > 0")
+        var.rel_thresh = [float(args.rel_thresh)] * 2
+    log_app.info("relative peak threshold: %g x background std%s", var.rel_thresh[0],
+                 "" if var.rel_thresh[0] == DEFAULT_REL_THRESH else f" (trained with {DEFAULT_REL_THRESH:g})")
     if not os.path.exists(args.model):
         raise SystemExit(f"model not found: {args.model} (train it with: python train_fusion_torch.py)")
     out_dir = args.out_dir or os.path.join(paths.RESULTS, args.exp_name)
@@ -2653,6 +2758,8 @@ def main():
 
     worker = Worker(AutoSource(root, args.exp_name, args.n_fibers), out_dir, args.mode, args.model,
                     args.cut_off, analysis=args.analysis)
+    if args.latency:
+        worker.lat = LatencyLog(out_dir, args.clock_probe_dir or os.path.dirname(root))
     log_app.info("analysis: %s", args.analysis)
     worker.start()
     log_app.info("results: %s", out_dir)
