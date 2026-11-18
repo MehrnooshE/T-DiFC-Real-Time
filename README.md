@@ -9,8 +9,8 @@ The folder is standalone: the code, the labeled training data, the trained model
 ```
 ├── tdifc_app.py               the real-time app (GUI), run from the terminal
 ├── tdifc_app_desktop.py       the same app with a start-up window, for the macOS app (see Desktop app)
-├── tdifc_app_desktop.spec     PyInstaller recipe of "t-DiFC Live v3.app"
-├── build_mac.sh               builds dist/t-DiFC Live v3.app and the zip to share
+├── tdifc_app_desktop.spec     PyInstaller recipe of "t-DiFC Live v4.app"
+├── build_mac.sh               builds dist/t-DiFC Live v4.app and the zip to share
 ├── requirements-build.txt     extra packages for the build (PyInstaller)
 ├── train_fusion_torch.py      trains the 5 seeds in PyTorch -> models/
 ├── evaluate_fusion_torch.py   val / test metrics at the 0.6 cut-off; comparison with the Keras seeds
@@ -26,6 +26,7 @@ The folder is standalone: the code, the labeled training data, the trained model
 │   ├── model.py               PyTorch architecture; FusionEnsemble (loads and scores)
 │   ├── streaming.py           causal (real-time) version of the preprocessing
 │   ├── latency.py             timing log of tdifc_app.py --latency (file times, NAS clock probe)
+│   ├── nas_latency.py         DAQ laptop -> NAS latency from the chunk files (the window's Latency tab)
 │   ├── metrics.py             metrics, scan-level bootstrap (copy of common.py)
 │   └── paths.py               folder paths, split loading
 ├── data/
@@ -92,6 +93,10 @@ Options: `--mode auto|pulsed|continuous` (laser illumination; default auto, deci
 
 **Reviewing calls.** The panel right of the clip steps through the candidates of one set: detected peaks, near misses (0.5 ≤ p < cut-off), all rejected, all candidates, or *Reviewed* (the ones you have already judged). **⏮ First / ◀ Prev / Next ▶ / Latest ⏭** move through the set in time order (keys Home, ←, →, End); the counter shows the candidate's position in the set and how many are left to review. For the candidate on screen, **✓ Peak** (Y) or **✗ Artifact** (N) records your verdict; pressing the other button changes it, the same button again clears it. *skip reviewed* leaves out candidates already judged (not in the *Reviewed* set), *next after verdict* moves on automatically. The panel counts what has been reviewed: of the detected peaks, how many you confirmed (a live precision estimate); of the near misses and the other rejected candidates, how many you judged to be peaks (missed peaks). Verdicts go to `results/<exp_name>/review.csv` (see below). The app always uses a light theme, also when macOS is in dark mode.
 
+**Latency tab** (next to Clearance), sub-tab **DAQ laptop → NAS**: while the app analyses a chunk file it also keeps the save time in the file's .mat header (*Created on*, DAQ laptop clock, whole seconds; from the header the file load returns) and the file's creation time on the NAS (NAS clock; from the file check the loader makes anyway), so no file is read twice and nothing extra is read at start-up. **▶ Generate report** draws, for the chunk files analysed so far, the delay per chunk over the recording, its distribution, and the time between files arriving on the NAS (dashed line: one chunk, 10 s). Delay = NAS created − (Created on of the first chunk + data time since it) − one constant offset, with the fastest file at 0; the clock drift between laptop and NAS is not corrected. The report stays as it is until **⟳ Update**. It covers the files analysed so far in any analysis mode (real time, offline then real time, offline). **💾 CSV** writes the per-chunk table to `latency_daq_nas.csv` in the results folder, **💾 PNG** the report. The plots are fixed (no zoom); the mouse wheel scrolls the page.
+
+**Clearance tab**: **▶ Generate plot** makes the clearance plot and its exponential fit; before the click nothing is computed. From then on the plot follows the new data.
+
 **Output** (`results/<exp_name>/`; `candidates.csv` and `summary.json` are rewritten from the start each time the app is started, `review.csv` is kept):
 - `candidates.csv`: one row per candidate as soon as it is scored: `sample`, `time_s`, `time_h`, `chunk`, `source_file`, `laser_mode`, `at_laser_edge` (≤ 25 ms from a laser ON/OFF edge), `p_fusion_lr1e-4_wd_ls_torch` (5-seed mean), `detected` (p ≥ cut-off), `analysed_as` (`offline`: saved before the app started; `real-time`).
 - `review.csv`: one row per verdict, appended, never wiped: `sample`, `time_s`, `time_h`, `source_file`, the model probability, `model_call` (peak / artifact at the cut-off), `operator_label` (peak / artifact; empty = verdict cleared), `reviewed_at`. The last row of a sample is its verdict. After a restart the verdicts are matched back to the candidates by sample number (the analysis is deterministic, so the same candidates come back).
@@ -122,7 +127,7 @@ or give the difference as `--laptop_minus_nas <s>`. Without either, the laptop �
 
 ## Desktop app (macOS)
 
-`tdifc_app_desktop.py` is `tdifc_app.py` with a start-up window, packaged as **t-DiFC Live v3.app**, so the app can be shared with people who do not use the terminal (no Python or environment needed).
+`tdifc_app_desktop.py` is `tdifc_app.py` with a start-up window, packaged as **t-DiFC Live v4.app**, so the app can be shared with people who do not use the terminal (no Python or environment needed).
 
 **Build** (on a Mac, in this folder, with the environment of *Setup*):
 
@@ -130,9 +135,9 @@ or give the difference as `--laptop_minus_nas <s>`. Without either, the laptop �
 ./build_mac.sh
 ```
 
-It takes about 3 min and writes `dist/t-DiFC Live v3.app` (~500 MB, PyTorch included) and **`dist/t-DiFC-Live-v3-mac-arm64.zip`** (~180 MB), the file to share (e.g. as a GitHub Release asset or by Teams / OneDrive). A build on Apple silicon runs on Apple-silicon Macs (M1 or later, macOS 12+); build on an Intel Mac for Intel Macs. `build/` and `dist/` are not committed.
+It takes about 3 min and writes `dist/t-DiFC Live v4.app` (~500 MB, PyTorch included) and **`dist/t-DiFC-Live-v4-mac-arm64.zip`** (~180 MB), the file to share (e.g. as a GitHub Release asset or by Teams / OneDrive). A build on Apple silicon runs on Apple-silicon Macs (M1 or later, macOS 12+); build on an Intel Mac for Intel Macs. `build/` and `dist/` are not committed.
 
-**Use.** Unzip, move *t-DiFC Live v3* to Applications and double-click it. The start-up window asks for:
+**Use.** Unzip, move *t-DiFC Live v4* to Applications and double-click it. The start-up window asks for:
 - **Data**: the experiment folder DiDAQ writes into (the one with `F1`, `F2`, …; choosing `F1` itself also works). The experiment name is read from the chunk files, and the window shows what it found (e.g. *7490 chunk files, about 20.8 h*). A folder that is still empty is fine: the app waits for DiDAQ.
 - **Analysis**: real time (default), offline then real time, or offline only (as `--analysis`).
 - **Results**: by default `~/Documents/t-DiFC results/<experiment name>/`, with `candidates.csv`, `summary.json`, `review.csv` and the log `tdifc_app.log`.
@@ -140,9 +145,9 @@ It takes about 3 min and writes `dist/t-DiFC Live v3.app` (~500 MB, PyTorch incl
 
 **Start** opens the main window (as `tdifc_app.py`). The choices are remembered for the next start. From the terminal, the desktop version still takes the options of `tdifc_app.py`; with `--save_dir` and `--exp_name` it skips the start-up window.
 
-**First start on another Mac.** The app is not signed with an Apple Developer ID, so macOS blocks it the first time: *"t-DiFC Live v3" cannot be opened* (or *Apple could not verify…*). Once per Mac:
+**First start on another Mac.** The app is not signed with an Apple Developer ID, so macOS blocks it the first time: *"t-DiFC Live v4" cannot be opened* (or *Apple could not verify…*). Once per Mac:
 - macOS 14 and older: right-click (Control-click) the app → **Open** → **Open**.
-- macOS 15 and newer: double-click once, then **System Settings → Privacy & Security**, scroll down to *"t-DiFC Live v3" was blocked* → **Open Anyway**.
+- macOS 15 and newer: double-click once, then **System Settings → Privacy & Security**, scroll down to *"t-DiFC Live v4" was blocked* → **Open Anyway**.
 
 macOS then asks once for access to the network volume (NAS) and the Documents folder: allow both. (Signing and notarizing the app with an Apple Developer account removes the warning.)
 

@@ -70,6 +70,7 @@ from tdifc.model import FusionEnsemble
 from tdifc.streaming import StreamProcessor, looks_pulsed
 from tdifc import peak_detection as pkd, scan_preprocessing as scp, spectral as spc
 from tdifc import signal_functions as sigf
+from tdifc import nas_latency
 from tdifc.latency import LatencyLog
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -104,8 +105,7 @@ TRIM_STEP_SECS       = 600      # the oldest display data is dropped in 10-min s
 HIGHLIGHT_MAX_SPAN   = 600      # highlights + labels are drawn when the trace shows <= 10 min
 MAGNIFIER_SECS       = 2        # width of the movable magnifier window on the trace
 MAGNIFIER_STRETCH    = (5, 4)   # width share trace : magnifier while the magnifier is on
-SIDEBAR_WIDTH        = 450      # px of the review sidebar (drag the divider to change it)
-CLEARANCE_SHARE      = 0.5      # the sidebar widens to this share of the window on the Clearance tab
+SIDEBAR_WIDTH        = 450      # px of the sidebar, the same for all its tabs (drag the divider to change it)
 WINDOW_SIZE          = (1480, 900)   # start size (px); capped to the screen
 COLOR_PEAK           = "#dc3c3c"     # CTC / detected peak: barcode, trace highlights, magnifier, review
                                      # (default; changed with the colour swatch beside "Barcode", remembered)
@@ -135,6 +135,7 @@ DEFAULT_REL_THRESH   = var.rel_thresh[0]   # peak threshold (x background std) t
 # SHARED QUEUE  - worker puts plot-ready dicts, GUI timer reads them
 # ─────────────────────────────────────────────────────────────────────────────
 PLOT_QUEUE: queue.Queue = queue.Queue()
+FILE_TIMES: dict = {}   # file name -> (Created on in its header, creation time on the file server), kept by load_mat_stable for the Latency tab
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -206,8 +207,9 @@ def load_mat_stable(path: str, tries: int = 25, wait: float = 0.2):
     last, err = -1, None
     for _ in range(tries):
         try:
-            size = os.path.getsize(path)
-            settled = time.time() - os.path.getmtime(path) > 2.0      # an older file is complete
+            st = os.stat(path)                                     # one call: size, times
+            size = st.st_size
+            settled = time.time() - st.st_mtime > 2.0                 # an older file is complete
             if size > 0 and (size == last or settled):
                 try:
                     mat = sio.loadmat(path, squeeze_me=False)
@@ -228,6 +230,8 @@ def load_mat_stable(path: str, tries: int = 25, wait: float = 0.2):
                 if raw.shape[0] < raw.shape[1]:
                     raw = raw.T
                 t = np.asarray(mat["time"]).ravel().astype(np.float64) if "time" in mat else None
+                FILE_TIMES[os.path.basename(path)] = (nas_latency.header_time(mat.get("__header__")),
+                                                      getattr(st, "st_birthtime", None) or st.st_mtime)
                 return raw, t
             last = size
         except ChunkReadError:
@@ -1207,6 +1211,20 @@ class DisplayBuffer:
 # ─────────────────────────────────────────────────────────────────────────────
 # GUI  - main thread only, zero ML work
 # ─────────────────────────────────────────────────────────────────────────────
+class FixedPlotWidget(pg.PlotWidget):
+    """A plot that leaves the mouse wheel to the page around it (no zoom; the page scrolls)."""
+
+    def wheelEvent(self, ev):
+        w = self.parentWidget()                     # the scroll area this plot sits in
+        while w is not None and not isinstance(w, QtWidgets.QAbstractScrollArea):
+            w = w.parentWidget()
+        if w is None:
+            ev.ignore()
+            return
+        QtWidgets.QApplication.sendEvent(w.verticalScrollBar(), ev)
+        ev.accept()
+
+
 class TDiFCWindow:
     CH_COLORS = ["#3fb950", "#e06c00", "#58a6ff", "#d29922"]
 
@@ -1256,6 +1274,7 @@ class TDiFCWindow:
         self._final_t = 0.0            # recording time (s) analysed so far
         self._clr = None               # clearance tab widgets
         self._clr_key = None
+        self._clr_on = False           # the plot is made after its button
         self._clr_warn_text = ""
         # operator review of the model's calls: results/<exp_name>/review.csv (append-only, never
         # wiped; verdicts are matched back to candidates by sample number after a restart)
@@ -1291,7 +1310,7 @@ class TDiFCWindow:
         self._side_tabs = QtWidgets.QTabWidget()
         self._side_tabs.addTab(self._build_review_tab(), "Review calls")
         self._side_tabs.addTab(self._build_clearance_tab(), "Clearance")
-        self._side_prev, self._side_w = 0, {}
+        self._side_tabs.addTab(self._build_latency_tab(), "Latency")
         self._side_tabs.currentChanged.connect(self._side_tab_changed)
 
         self._split = QtWidgets.QSplitter(QtCore.Qt.Orientation.Horizontal)
@@ -1531,13 +1550,7 @@ class TDiFCWindow:
         return card
 
     def _side_tab_changed(self, i):
-        """Each sidebar tab keeps its own width: Review narrow, Clearance wide (drag to change)."""
-        sizes = self._split.sizes()
-        total = sum(sizes)
-        self._side_w[self._side_prev] = sizes[1]
-        w = self._side_w.get(i) or (SIDEBAR_WIDTH if i == 0 else int(total * CLEARANCE_SHARE))
-        self._split.setSizes([total - w, w])
-        self._side_prev = i
+        """All sidebar tabs share one width (drag the divider to change it for all)."""
         if i == 1:
             self._clr_key = None
             self._update_clearance()
@@ -2193,6 +2206,175 @@ class TDiFCWindow:
             log_app.error("Save barcode failed: %s", e)
 
     # ----------------------------------------------------------- clearance ---
+    # -------------------------------------------------------------- latency ---
+    def _build_latency_tab(self):
+        """Latency tab: sub-tabs per stage; for now DAQ laptop -> NAS (tdifc/nas_latency.py)."""
+        page = QtWidgets.QWidget()
+        page.setObjectName("sidepage")
+        lay = QtWidgets.QVBoxLayout(page)
+        lay.setContentsMargins(8, 8, 8, 8)
+        self._lat_tabs = QtWidgets.QTabWidget()
+        self._lat_tabs.setDocumentMode(True)
+        self._lat_tabs.addTab(self._build_nas_latency_page(), "DAQ laptop → NAS")
+        lay.addWidget(self._lat_tabs)
+        self._lat_chunks, self._lat_pos, self._lat_result = {}, 0, None
+        return page
+
+    @staticmethod
+    def _lat_plot(xlabel, ylabel):
+        """A fixed plot: no zoom or pan with the mouse; the wheel scrolls the page."""
+        pw = FixedPlotWidget(background="w")
+        p = pw.getPlotItem()
+        p.setLabel("bottom", xlabel)
+        p.setLabel("left", ylabel)
+        for ax in ("left", "bottom"):
+            p.getAxis(ax).enableAutoSIPrefix(False)
+        p.showGrid(x=False, y=True, alpha=0.15)
+        p.setMouseEnabled(x=False, y=False)
+        p.setMenuEnabled(False)
+        p.hideButtons()
+        pw.setFixedHeight(230)
+        return pw, p
+
+    def _build_nas_latency_page(self):
+        page = QtWidgets.QWidget()
+        page.setObjectName("sidepage")
+        outer = QtWidgets.QVBoxLayout(page)
+        outer.setContentsMargins(4, 8, 4, 4)
+        outer.setSpacing(6)
+        ctl = QtWidgets.QHBoxLayout()
+        self._lat_gen_btn = self._button("▶  Generate report", self._latency_generate,
+                                         tip="Report of the chunk files analysed so far")
+        self._lat_upd_btn = self._button("⟳  Update", self._latency_generate,
+                                         tip="Make the report again, with the chunk files analysed since")
+        self._lat_upd_btn.setVisible(False)
+        self._lat_csv_btn = self._button("💾  CSV", self._save_latency_csv, tip="Per-chunk table -> latency_daq_nas.csv")
+        self._lat_png_btn = self._button("💾  PNG", self._save_latency_png, tip="Save the report as PNG")
+        for b in (self._lat_csv_btn, self._lat_png_btn):
+            b.setEnabled(False)
+        for b in (self._lat_gen_btn, self._lat_upd_btn):
+            ctl.addWidget(b)
+        self._lat_status = QtWidgets.QLabel("")
+        self._lat_status.setObjectName("muted")
+        self._lat_status.setWordWrap(True)
+        ctl.addWidget(self._lat_status, 1)
+        ctl.addWidget(self._lat_csv_btn)
+        ctl.addWidget(self._lat_png_btn)
+        outer.addLayout(ctl)
+        self._lat_stack = QtWidgets.QStackedWidget()
+        ph = QtWidgets.QLabel("Click  ▶ Generate report  to make the report from the chunk files analysed so far.\n"
+                              "It stays as it is until you click  ⟳ Update.")
+        ph.setObjectName("muted")
+        ph.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        ph.setStyleSheet("QLabel { border:1px dashed #c9ced6; border-radius:6px; }")
+        self._lat_stack.addWidget(ph)
+        scroll = QtWidgets.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        body = QtWidgets.QWidget()
+        body.setObjectName("sidepage")
+        lay = QtWidgets.QVBoxLayout(body)
+        lay.setContentsMargins(0, 0, 6, 0)
+        lay.setSpacing(6)
+        self._lat_body = body
+        brush, pen = pg.mkBrush(90, 143, 216, 170), pg.mkPen(None)
+        lay.addWidget(self._section("Delay over the recording", "per chunk file"))
+        w, self._lat_p_delay = self._lat_plot("recording time (h)", "delay (ms)")
+        self._lat_sc_delay = pg.ScatterPlotItem(size=4, pen=pen, brush=brush)
+        self._lat_p_delay.addItem(self._lat_sc_delay)
+        self._lat_p_delay.addItem(pg.InfiniteLine(pos=0, angle=0, pen=pg.mkPen("#888888", width=1)))
+        lay.addWidget(w)
+        lay.addWidget(self._section("Distribution of the delay", "chunk files per bin, log scale"))
+        w, self._lat_p_hist = self._lat_plot("delay (ms)", "chunk files")
+        self._lat_bars = pg.BarGraphItem(x=[], height=[], width=1, brush=pg.mkBrush("#5a8fd8"), pen=pg.mkPen("#ffffff"))
+        self._lat_p_hist.addItem(self._lat_bars)
+        self._lat_p_hist.getAxis("left").setTicks([[(k + 1, f"{10 ** k:g}") for k in range(7)], []])
+        lay.addWidget(w)
+        lay.addWidget(self._section("Time between files arriving on the NAS", "from one chunk file to the next"))
+        w, self._lat_p_step = self._lat_plot("recording time (h)", "time to the previous file (s)")
+        self._lat_sc_step = pg.ScatterPlotItem(size=4, pen=pen, brush=brush)
+        self._lat_p_step.addItem(self._lat_sc_step)
+        self._lat_ref = pg.InfiniteLine(pos=10, angle=0, pen=pg.mkPen("#888888", width=1,
+                                                                       style=QtCore.Qt.PenStyle.DashLine),
+                                        label="one chunk", labelOpts={"position": 0.92, "color": "#6e7781", "anchors": [(1, 1), (1, 1)]})
+        self._lat_p_step.addItem(self._lat_ref)
+        lay.addWidget(w)
+        note = QtWidgets.QLabel(
+            "Delay = NAS created − (Created on of the first chunk + data time since it) − one constant offset, "
+            "with the fastest file at 0; no clock-drift correction. Created on: the save time in the .mat header "
+            "(DAQ laptop clock, whole seconds). NAS created: the file's creation time on the NAS (NAS clock).")
+        note.setObjectName("muted")
+        note.setWordWrap(True)
+        lay.addWidget(note)
+        lay.addStretch()
+        scroll.setWidget(body)
+        self._lat_stack.addWidget(scroll)
+        outer.addWidget(self._lat_stack, 1)
+        return page
+
+    def _latency_generate(self):
+        """Report button: the header and NAS times of the chunk files analysed so far (recorded while
+        they were loaded, no extra reads); drawn once, until the next Update."""
+        rows = self.worker.chunks[self._lat_pos:]
+        self._lat_pos += len(rows)
+        for s0, e0, idx, t0, fname in rows:
+            end = t0 + (e0 - s0) / SAMPLING_RATE
+            c = self._lat_chunks.get(idx)
+            self._lat_chunks[idx] = (fname, t0 if c is None else c[1], end)
+        times = {k: (c[0],) + FILE_TIMES.get(c[0], (None, None)) for k, c in self._lat_chunks.items()}
+        self._lat_gen_btn.setVisible(False)
+        self._lat_upd_btn.setVisible(True)
+        a = nas_latency.analyse(times, dict(self._lat_chunks))
+        self._lat_result = a
+        if a is None:
+            self._lat_status.setText("Needs at least two analysed chunk files")
+            return
+        self._lat_status.setText(f"Report of {a['n_files']:,} chunk files (up to chunk {a['idx'][-1]}), made at "
+                                 f"{time.strftime('%H:%M:%S')}")
+        if a["delay_ms"] is not None:
+            d = a["delay_ms"]
+            self._lat_sc_delay.setData(a["hours"], d)
+            span = max(float(d.max()), 1.0)
+            raw = span / 70
+            wdt = next((v for v in (0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000) if v >= raw), 1000)
+            cnt, edges = np.histogram(d, bins=np.arange(min(0.0, float(d.min())), span + wdt, wdt))
+            m = cnt > 0
+            self._lat_bars.setOpts(x=(edges[:-1][m] + wdt / 2), height=np.log10(cnt[m]) + 1, width=wdt * 0.9)
+            self._lat_p_hist.setYRange(0, np.log10(cnt.max()) + 1.3, padding=0)
+        else:
+            self._lat_sc_delay.setData([], [])
+            self._lat_bars.setOpts(x=[], height=[])
+            self._lat_status.setText(self._lat_status.text() + " · no 'Created on' header in these files: no delay")
+        self._lat_sc_step.setData(a["step_hours"], a["nas_step"])
+        self._lat_ref.setValue(a["usual_len"])
+        self._lat_ref.label.setFormat(f"one chunk ({a['usual_len']:.1f} s)")
+        for p in (self._lat_p_delay, self._lat_p_hist, self._lat_p_step):
+            p.enableAutoRange(x=True, y=p is not self._lat_p_hist)
+        for b in (self._lat_csv_btn, self._lat_png_btn):
+            b.setEnabled(True)
+        self._lat_stack.setCurrentIndex(1)
+
+    def _save_latency_csv(self):
+        a = self._lat_result
+        if a is None:
+            return
+        path = os.path.join(self.out_dir, "latency_daq_nas.csv")
+        try:
+            nas_latency.write_csv(path, a)
+            log_app.info("Latency table saved to %s", path)
+        except Exception as e:
+            log_app.error("Save latency table failed: %s", e)
+
+    def _save_latency_png(self):
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            None, "Save latency report", os.path.join(self.out_dir, "latency_daq_nas.png"), "PNG (*.png)")
+        if path:
+            try:
+                self._lat_body.grab().save(path)
+                log_app.info("Latency report saved to %s", path)
+            except Exception as e:
+                log_app.error("Save latency report failed: %s", e)
+
     def _build_clearance_tab(self):
         page = QtWidgets.QWidget()
         page.setObjectName("sidepage")
@@ -2220,15 +2402,38 @@ class TDiFCWindow:
         ctl.addWidget(QtWidgets.QLabel("Skip first"))
         ctl.addWidget(self._clr_skip)
         ctl.addStretch()
-        ctl.addWidget(self._button("💾  Save PNG", self._save_clearance, tip="Save the plot and the fit results as PNG"))
+        self._clr_gen_btn = self._button("▶  Generate plot", self._clearance_generate,
+                                         tip="Make the clearance plot and fit; it then follows the new data")
+        ctl.addWidget(self._clr_gen_btn)
+        self._clr_save_btn = self._button("💾  Save PNG", self._save_clearance,
+                                          tip="Save the plot and the fit results as PNG")
+        self._clr_save_btn.setEnabled(False)
+        ctl.addWidget(self._clr_save_btn)
         lay.addLayout(ctl)
         note = QtWidgets.QLabel("Skipped bins are still plotted (hollow); the fit starts after them.")
         note.setObjectName("muted")
         note.setWordWrap(True)
         lay.addWidget(note)
         self._clr = self._make_clearance_fig()
-        lay.addWidget(self._clr["fig"], 1)
+        self._clr_stack = QtWidgets.QStackedWidget()
+        ph = QtWidgets.QLabel("Click  ▶ Generate plot  to make the clearance plot and fit.\n"
+                              "From then on it follows the new data.")
+        ph.setObjectName("muted")
+        ph.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        ph.setStyleSheet("QLabel { border:1px dashed #c9ced6; border-radius:6px; }")
+        self._clr_stack.addWidget(ph)
+        self._clr_stack.addWidget(self._clr["fig"])
+        lay.addWidget(self._clr_stack, 1)
         return page
+
+    def _clearance_generate(self):
+        """Clearance button: from now on the plot is made and kept up to date."""
+        self._clr_on = True
+        self._clr_gen_btn.setVisible(False)
+        self._clr_save_btn.setEnabled(True)
+        self._clr_stack.setCurrentIndex(1)
+        self._clr_key = None
+        self._update_clearance()
 
     def _make_clearance_fig(self, title=None):
         """Plot + fit results + warnings, for the Clearance tab and (a fresh copy) for the saved PNG."""
@@ -2389,7 +2594,7 @@ class TDiFCWindow:
         h["warn"].setVisible(bool(d["warns"]))
 
     def _update_clearance(self):
-        if self._clr is None:
+        if self._clr is None or not self._clr_on:
             return
         key = (self._clr_bin.value(), self._clr_skip.value(),
                int(self._final_t // (self._clr_bin.value() * 60)), len(self._det_t))

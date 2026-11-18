@@ -1,14 +1,14 @@
 #!/bin/bash
-# Builds the macOS app "dist/t-DiFC Live v3.app" from tdifc_app_desktop.py and a zip to share it:
-#   dist/t-DiFC-Live-v3-mac-<arch>.zip
+# Builds the macOS app "dist/t-DiFC Live v4.app" from tdifc_app_desktop.py and a zip to share it:
+#   dist/t-DiFC-Live-v4-mac-<arch>.zip
 # Run in this folder with the project's environment set up (README: SETUP):
 #   ./build_mac.sh
 set -euo pipefail
 cd "$(dirname "$0")"
 PY=t-difc-rt-env/bin/python
-APP="t-DiFC Live v3"
+APP="t-DiFC Live v4"
 ARCH=$(uname -m)                                      # arm64: Apple silicon Macs only
-ZIP="dist/t-DiFC-Live-v3-mac-$ARCH.zip"
+ZIP="dist/t-DiFC-Live-v4-mac-$ARCH.zip"
 
 "$PY" -m pip install -q -r requirements-build.txt
 "$PY" -m PyInstaller --noconfirm --clean tdifc_app_desktop.spec
